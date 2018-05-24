@@ -1,0 +1,41 @@
+﻿<Window x:Class="CUDA流程图提取工具.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CUDA流程图提取工具"
+        mc:Ignorable="d"
+        Title="cuda流程图提取工具" Height="768" Width="1366">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="780"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu Background="Transparent" Grid.RowSpan="2" Grid.Row="0" Grid.ColumnSpan="2">
+            <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="文件">
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="open.." Click="FILE_OPEN"></MenuItem>
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="open cubin file" Click="OPEN_CUBIN"></MenuItem>
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header ="save CFG using Graphviz" Click="SAVE_PICTURE"></MenuItem>
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header ="exit" Click="EXIT"></MenuItem>
+            </MenuItem>
+            <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="操作">
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="compile CUDA" Click="COMPILE_CUDA"></MenuItem>
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="reverse compile CUBIN" Click="COMPILE"></MenuItem>
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="draw CFG" Click="DRAW_CFG"></MenuItem>
+            </MenuItem>
+            <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="其他">
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="background image change" Click="BGI_CHANGE"></MenuItem>
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="about" Click="ABOUT"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <TextBox Name="STRVision" Height="674" TextWrapping="Wrap"   Background="Transparent" IsReadOnly="True" 
+                 Grid.Column="1" Grid.Row="1"/>
+        <ScrollViewer Grid.Column="0" Grid.Row="1" VerticalScrollBarVisibility="Visible">
+            <Canvas x:Name="SP"/>
+        </ScrollViewer>
+    </Grid>
+</Window>
