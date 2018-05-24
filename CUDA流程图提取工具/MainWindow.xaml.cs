@@ -31,11 +31,19 @@ namespace CUDA流程图提取工具
         string[] CFGresult = new string[1000];
         string[] CFGtype = new string[1000];
 
+        /// <summary>
+        /// page update/页面更新
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// 打开CUDA程序和C程序
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FILE_OPEN(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -51,6 +59,11 @@ namespace CUDA流程图提取工具
             
         }
 
+        /// <summary>
+        /// 打开CUBIN文件（打开之后的处理稍有不同）
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OPEN_CUBIN(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -62,6 +75,11 @@ namespace CUDA流程图提取工具
             }
         }
 
+        /// <summary>
+        /// 保存CFG（使用graphviz，未安装的情况下不能保存）
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SAVE_PICTURE(object sender, RoutedEventArgs e)
         {
             try
@@ -102,11 +120,21 @@ namespace CUDA流程图提取工具
             }
         }
 
+        /// <summary>
+        /// 退出程序
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EXIT(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
+        /// <summary>
+        /// CUDA程序的编译（需要正确安装和配置NVCC）
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void COMPILE_CUDA(object sender, RoutedEventArgs e)
         {
             try
@@ -140,6 +168,11 @@ namespace CUDA流程图提取工具
             }
         }
 
+        /// <summary>
+        /// CUBIN程序的反编译（需要正确安装配置nvdisasm）
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void COMPILE(object sender, RoutedEventArgs e)
         {
             try
@@ -173,6 +206,11 @@ namespace CUDA流程图提取工具
             }
         }
 
+        /// <summary>
+        /// CFG的绘图程序，前提是要成功反编译cubin文件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DRAW_CFG(object sender, RoutedEventArgs e)
         {
             try
@@ -316,11 +354,21 @@ namespace CUDA流程图提取工具
             }
         }
 
+        /// <summary>
+        /// 创立一个新的block，用于绘制该block到canvas中
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="type"></param>
         private void CreateBlock(string text,string type)
         {
             BlockDatas.Add(new BlockData {Content = text,height = MarginCal(text),type = type });
         }
 
+        /// <summary>
+        /// 绘制一个新的block，前提是要先创立该block
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="Margin_Top"></param>
         private void Drawblock(string text, int Margin_Top)
         {
             var block = new MyControl.Block { Text = text };
@@ -333,6 +381,11 @@ namespace CUDA流程图提取工具
             this.SP.Children.Add(block);
         }
 
+        /// <summary>
+        /// 计算每一个block所需要的位移（要不然会重叠到一起去）
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         private int MarginCal(string text)
         {
             int MarginReturn = 1;
@@ -348,6 +401,11 @@ namespace CUDA流程图提取工具
             return MarginReturn;
         }
 
+        /// <summary>
+        /// 绘制CFG中需要的弧线
+        /// </summary>
+        /// <param name="margin"></param>
+        /// <param name="num"></param>
         private void Drawline(int margin, int num)
         {
             System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
@@ -362,6 +420,11 @@ namespace CUDA流程图提取工具
             SP.Children.Add(path);
         }
 
+        /// <summary>
+        /// 改变UI的背景（支持jpg,png,bmp格式文件，画面比例为16：9）
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BGI_CHANGE(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -376,6 +439,11 @@ namespace CUDA流程图提取工具
             }
         }
 
+        /// <summary>
+        /// 关于（即便里面made by后面有英文和日文，作者就是我老王哒！）
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ABOUT(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("made by こしま/Takakaze", "ABOUT", MessageBoxButton.OK);

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CUDA流程图提取工具
 {
+    /// <summary>
+    /// BlockData类的用处是存放和设定所有构成CFG的TEXTBLOCK的所有属性
+    /// </summary>
     public class BlockData
     {
         public string Content { get; set; }

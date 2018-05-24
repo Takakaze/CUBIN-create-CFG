@@ -20,6 +20,9 @@ namespace CUDA流程图提取工具.MyControl
     /// </summary>
     public partial class Block : UserControl
     {
+        /// <summary>
+        /// block工具所显示的文字内容获取
+        /// </summary>
         public string Text
         { get
             {
@@ -30,6 +33,10 @@ namespace CUDA流程图提取工具.MyControl
                 this.tb.Text = value;
             }
         }
+
+        /// <summary>
+        /// block工具的自我刷新
+        /// </summary>
         public Block()
         {
             InitializeComponent();
