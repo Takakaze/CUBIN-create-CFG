@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Configuration;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,6 +37,10 @@ namespace CUDA流程图提取工具
         /// </summary>
         public MainWindow()
         {
+            ImageBrush imageBrush = new ImageBrush();
+            imageBrush.ImageSource = new BitmapImage(new Uri(ConfigurationManager.AppSettings["BGI"], UriKind.Absolute));
+            imageBrush.Stretch = Stretch.Fill;//设置图像的显示格式  
+            this.Background = imageBrush;
             InitializeComponent();
         }
 
@@ -96,7 +101,7 @@ namespace CUDA流程图提取工具
                     commandstr += cubinpath;
                     commandstr += " | ";
                     commandstr += "dot";
-                    commandstr += " -o";
+                    commandstr += " -o ";
                     commandstr += output;
                     commandstr += " -Tpng";
                     System.Diagnostics.Process p = new System.Diagnostics.Process();
@@ -105,7 +110,7 @@ namespace CUDA流程图提取工具
                     p.StartInfo.RedirectStandardInput = true;//接受来自调用程序的输入信息
                     p.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息
                     p.StartInfo.RedirectStandardError = true;//重定向标准错误输出
-                    p.StartInfo.CreateNoWindow = true;//不显示程序窗口
+                    p.StartInfo.CreateNoWindow = false;//不显示程序窗口
                     p.Start();//启动程序
                     p.StandardInput.WriteLine(commandstr + "&exit");
                     p.StandardInput.AutoFlush = true;
@@ -157,8 +162,6 @@ namespace CUDA流程图提取工具
                 output = p.StandardOutput.ReadToEnd();
                 p.WaitForExit();
                 p.Close();
-                output = output.Replace("&exit", "^");
-                output = output.Substring(output.IndexOf('^') + 1);
                 STRVision.Text = output;
             }
             catch (Exception ex)
@@ -188,7 +191,7 @@ namespace CUDA流程图提取工具
                 p.StartInfo.RedirectStandardInput = true;//接受来自调用程序的输入信息
                 p.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息
                 p.StartInfo.RedirectStandardError = true;//重定向标准错误输出
-                p.StartInfo.CreateNoWindow = true;//不显示程序窗口
+                p.StartInfo.CreateNoWindow = false;//不显示程序窗口
                 p.Start();//启动程序
                 p.StandardInput.WriteLine(commandstr + "&exit");
                 p.StandardInput.AutoFlush = true;
@@ -436,6 +439,9 @@ namespace CUDA流程图提取工具
                 imageBrush.ImageSource = new BitmapImage(new Uri(ofd.FileName, UriKind.Absolute));
                 imageBrush.Stretch = Stretch.Fill;//设置图像的显示格式  
                 this.Background = imageBrush;
+                Configuration cfa = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                cfa.AppSettings.Settings["BGI"].Value = ofd.FileName;
+                cfa.Save();
             }
         }
 

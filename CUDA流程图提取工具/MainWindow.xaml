@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CUDA流程图提取工具"
         mc:Ignorable="d"
-        Title="cuda流程图提取工具" Height="768" Width="1366">
+        Title="cuda流程图提取工具"
+        Name="MWindow"
+        Height="768" Width="1366">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="780"/>
