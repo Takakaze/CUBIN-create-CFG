@@ -37,10 +37,17 @@ namespace CUDA流程图提取工具
         /// </summary>
         public MainWindow()
         {
-            ImageBrush imageBrush = new ImageBrush();
-            imageBrush.ImageSource = new BitmapImage(new Uri(ConfigurationManager.AppSettings["BGI"], UriKind.Absolute));
-            imageBrush.Stretch = Stretch.Fill;//设置图像的显示格式  
-            this.Background = imageBrush;
+            if (ConfigurationManager.AppSettings["BGI"] != null&& ConfigurationManager.AppSettings["BGI"] != "")
+            {
+                ImageBrush imageBrush = new ImageBrush();
+                imageBrush.ImageSource = new BitmapImage(new Uri(ConfigurationManager.AppSettings["BGI"], UriKind.Absolute));
+                imageBrush.Stretch = Stretch.Fill;//设置图像的显示格式  
+                this.Background = imageBrush;
+            }
+            else
+            {
+                this.Background = Brushes.White;
+            }
             InitializeComponent();
         }
 
@@ -110,7 +117,7 @@ namespace CUDA流程图提取工具
                     p.StartInfo.RedirectStandardInput = true;//接受来自调用程序的输入信息
                     p.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息
                     p.StartInfo.RedirectStandardError = true;//重定向标准错误输出
-                    p.StartInfo.CreateNoWindow = false;//不显示程序窗口
+                    p.StartInfo.CreateNoWindow = true;//不显示程序窗口
                     p.Start();//启动程序
                     p.StandardInput.WriteLine(commandstr + "&exit");
                     p.StandardInput.AutoFlush = true;
@@ -191,7 +198,7 @@ namespace CUDA流程图提取工具
                 p.StartInfo.RedirectStandardInput = true;//接受来自调用程序的输入信息
                 p.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息
                 p.StartInfo.RedirectStandardError = true;//重定向标准错误输出
-                p.StartInfo.CreateNoWindow = false;//不显示程序窗口
+                p.StartInfo.CreateNoWindow = true;//不显示程序窗口
                 p.Start();//启动程序
                 p.StandardInput.WriteLine(commandstr + "&exit");
                 p.StandardInput.AutoFlush = true;
@@ -445,6 +452,13 @@ namespace CUDA流程图提取工具
             }
         }
 
+        private void BGI_ERASE(object sender, RoutedEventArgs e)
+        {
+            this.Background = Brushes.White;
+            Configuration cfa = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            cfa.AppSettings.Settings["BGI"].Value = "";
+            cfa.Save();
+        }
         /// <summary>
         /// 关于（即便里面made by后面有英文和日文，作者就是我老王哒！）
         /// </summary>

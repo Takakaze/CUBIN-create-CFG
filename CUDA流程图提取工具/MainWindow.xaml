@@ -31,6 +31,7 @@
             </MenuItem>
             <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="其他">
                 <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="background image change" Click="BGI_CHANGE"></MenuItem>
+                <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="background image erase" Click="BGI_ERASE"></MenuItem>
                 <MenuItem FontFamily="Droid Sans Fallback" Background="Transparent" Header="about" Click="ABOUT"></MenuItem>
             </MenuItem>
         </Menu>
