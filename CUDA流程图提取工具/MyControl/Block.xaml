@@ -17,7 +17,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
-        <Border Background="White" BorderThickness="4" CornerRadius="20" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderBrush="#FF373737">
+        <Border Background="Transparent" BorderThickness="4" CornerRadius="20" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderBrush="#FF373737">
         </Border>
         <TextBlock x:Name="tb" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"></TextBlock>
     </Grid>
