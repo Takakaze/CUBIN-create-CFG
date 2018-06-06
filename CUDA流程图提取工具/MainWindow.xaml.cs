@@ -29,8 +29,12 @@ namespace CUDA流程图提取工具
         string output = "";
         List<BlockData> BlockDatas = new List<BlockData>();
         int BlockId = 0;
+        int arcCount = 0;
         string[] CFGresult = new string[1000];
         string[] CFGtype = new string[1000];
+        int blocknum = 0;
+        int[] Whichblock = new int[1000];
+        string[] Blockname = new string[1000];
 
         /// <summary>
         /// page update/页面更新
@@ -260,14 +264,43 @@ namespace CUDA流程图提取工具
                 output = output.Replace("label=", "");
                 output = output.Replace("{", "");
                 output = output.Replace("}", "");
-                output = output.Replace("\"", "");
                 output = output.Replace("[", "");
                 output = output.Replace("]", "");
                 output = output.Replace("|", "");
                 OP = output.ToCharArray();
+                for (int i = 0; i < OP.Length; i++)
+                {
+                    if (i <= 1 && OP[i] == '\"' && OP[i + 1] == '.' && OP[i - 1] == '\n')
+                    {
+                        i++;
+                        Blockname[blocknum] += OP[i];
+                        i++;
+                        for (; OP[i] != '\"'; i++)
+                        {
+                            Blockname[blocknum] += OP[i];
+                        }
+                        blocknum++;
+                    }
+                    else if (OP[i] == '\"' && OP[i + 1] == '.'&&OP[i-1]=='\n'&&(OP[i-2]!='\r'|| i-2<=0))
+                    {
+                        i++;
+                        Blockname[blocknum] += OP[i];
+                        i++;
+                        for (; OP[i] != '\"'; i++)
+                        {
+                            Blockname[blocknum] += OP[i];
+                        }
+                        blocknum++;
+                    }
+                }
+                blocknum = 0;
+                output = new string(OP);
+                output = output.Replace("\"", "");
+                OP = output.ToCharArray();
                 List<char> OPList = OP.ToList();
                 OPList.RemoveAt(0);
-                string[] arcCache = { "", "", "", "", "", "" };
+                int[] arcCache = new int[200];
+                int[] arcCache2 = new int[200];
                 for (int i = 2; i < 8; i++)
                 {
                     OPList.RemoveAt(OP.Length - i);
@@ -293,6 +326,7 @@ namespace CUDA流程图提取工具
                             CFGresult[BlockId] += OP[i];
                         }
                         CFGtype[BlockId] = "entry";
+                        CreateBlock(CFGresult[BlockId], CFGtype[BlockId] = "entry", Blockname[blocknum]);
                         BlockId++;
                     }
                     else if (OP[i] == '>' && OP[i - 5] == 'e' && OP[i - 4] == 'x' && OP[i - 3] == 'i' && OP[i - 2] == 't' && OP[i - 1] == '0')
@@ -304,31 +338,85 @@ namespace CUDA流程图提取工具
                             CFGresult[BlockId] += OP[i];
                         }
                         CFGtype[BlockId] = "exit0";
+                        CreateBlock(CFGresult[BlockId], CFGtype[BlockId] = "exit0", Blockname[blocknum]);
                         BlockId++;
+                        blocknum++;
                     }
-                    else if (OP[i] == '-' && OP[i + 1] == '>')
+                }
+
+                for (int i = 0; i < OP.Length; i++)
+                {
+                    if (OP[i] == '-' && OP[i + 1] == '>')
                     {
-                        for (int j = i; (OP[j] != 'e' || OP[j + 1] != 'x' || OP[j + 2] != 'i' || OP[j + 3] != 't' || OP[j + 4] != '0') && (OP[j] != 'e' || OP[j + 1] != 'n' || OP[j + 2] != 't' || OP[j + 3] != 'r' || OP[j + 4] != 'y'); j--)
+                        for (; OP[i] != '.' || OP[i - 1] != '\n'; i--) ;
+                        string match = "";
+                        for (; OP[i] != ':'; i++)
                         {
-                            if (OP[j + 1] == 'x')
+                            match += OP[i];
+                        }
+                        for (int j = 0; j < Blockname.Length; j++)
+                        {
+                            if (match == Blockname[j])
                             {
-                                arcCache[BlockId - 1] = "exit0";
-                                arcCache[BlockId - 2] = "entry";
-                            }
-                            else
-                            {
-                                arcCache[BlockId - 1] = "entry";
-                                arcCache[BlockId - 2] = "exit0";
+                                match = "";
+                                for (i++; OP[i] != ':'; i++)
+                                {
+                                    match += OP[i];
+                                }
+                                for (int k = 0; k < BlockId; k++)
+                                {
+                                    if (match == CFGtype[k])
+                                    {
+                                        for (int l = 0; l < BlockDatas.Count; l++)
+                                        {
+                                            if (Blockname[j] == BlockDatas[l].name && CFGtype[k] == BlockDatas[l].type)
+                                            {
+                                                arcCache[arcCount] = l;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
+                        match = "";
+                        for (; OP[i] != '.'; i++) ;
+                        for (; OP[i] != ':'; i++)
+                        {
+                            match += OP[i];
+                        }
+                        for (int j = 0; j < Blockname.Length; j++)
+                        {
+                            if (match == Blockname[j])
+                            {
+                                match = "";
+                                for (i++; OP[i] != ':'; i++)
+                                {
+                                    match += OP[i];
+                                }
+                                for (int k = 0; k < BlockId; k++)
+                                {
+                                    if (match == CFGtype[k])
+                                    {
+                                        for (int l = 0; l < BlockDatas.Count; l++)
+                                        {
+                                            if (Blockname[j] == BlockDatas[l].name && CFGtype[k] == BlockDatas[l].type)
+                                            {
+                                                arcCache2[arcCount] = l;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        arcCount++;
                     }
                 }
                 output = new string(OP);
                 STRVision.Text = output;
                 int margin = 0;
+                int margin2 = 0;
                 for (int i = 0; i < BlockId; i++)
                 {
-                    CreateBlock(CFGresult[i], CFGtype[i]);
                     if (i == 0)
                     {
                         Drawblock(BlockDatas[i].Content, 0);
@@ -346,14 +434,22 @@ namespace CUDA流程图提取工具
                 }
                 for (int i = 1; i < BlockId; i++)
                 {
-                    margin = 0;
-                    if (arcCache[i] == BlockDatas[i - 1].type && arcCache[i - 1] == BlockDatas[i].type)
+                    for (int j = 0; j < arcCache.Length; j++)
                     {
-                        for (int j = i - 2; j >= 0; j--)
+                        margin = 0;
+                        margin2 = 0;
+                        if (i == arcCache[j])
                         {
-                            margin += BlockDatas[j].height;
+                            for (int k=i-1; k >= 0; k--)
+                            {
+                                margin += BlockDatas[k].height;
+                            }
+                            for (int k = arcCache2[j]-1; k >= 0; k--)
+                            {
+                                margin2 += BlockDatas[k].height;
+                            }
+                            Drawline(margin, margin2);
                         }
-                        Drawline(margin, i);
                     }
                 }
             }
@@ -369,9 +465,9 @@ namespace CUDA流程图提取工具
         /// </summary>
         /// <param name="text"></param>
         /// <param name="type"></param>
-        private void CreateBlock(string text,string type)
+        private void CreateBlock(string text,string type,string blockname)
         {
-            BlockDatas.Add(new BlockData {Content = text,height = MarginCal(text),type = type });
+            BlockDatas.Add(new BlockData { Content = text, height = MarginCal(text), type = type, name = blockname });
         }
 
         /// <summary>
@@ -416,13 +512,13 @@ namespace CUDA流程图提取工具
         /// </summary>
         /// <param name="margin"></param>
         /// <param name="num"></param>
-        private void Drawline(int margin, int num)
+        private void Drawline(int margin, int margin2)
         {
             System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
             PathGeometry PG = new PathGeometry();
-            ArcSegment arc = new ArcSegment(new Point(700, margin+22), new Size(20, 50), 0, false, SweepDirection.Counterclockwise, true);
+            ArcSegment arc = new ArcSegment(new Point(700, margin+22), new Size(20, 50), 0, false, SweepDirection.Clockwise, true);
             PathFigure PF = new PathFigure();
-            PF.StartPoint = new Point(700, margin + BlockDatas[num - 1].height+22);
+            PF.StartPoint = new Point(700, margin2+22);
             PF.Segments.Add(arc);
             PG.Figures.Add(PF);
             path.Data = PG;

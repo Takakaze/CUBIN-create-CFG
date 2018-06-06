@@ -14,5 +14,6 @@ namespace CUDA流程图提取工具
         public string Content { get; set; }
         public int height { get; set; }
         public string type { get; set; }
+        public string name { get; set; }
     }
 }
