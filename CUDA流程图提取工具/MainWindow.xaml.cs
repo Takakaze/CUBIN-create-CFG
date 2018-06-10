@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Configuration;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -156,6 +157,10 @@ namespace CUDA流程图提取工具
             try
             {
                 string commandstr = "nvcc";
+                commandstr += " ";
+                commandstr += "-ccbin";
+                commandstr += " ";
+                commandstr += "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Tools\\MSVC\\14.14.26428\\bin\\Hostx64\\ x86\\cl.exe\"";
                 commandstr += " ";
                 commandstr += "-cubin";
                 commandstr += " ";
@@ -516,7 +521,7 @@ namespace CUDA流程图提取工具
         {
             System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
             PathGeometry PG = new PathGeometry();
-            ArcSegment arc = new ArcSegment(new Point(700, margin+22), new Size(20, 50), 0, false, SweepDirection.Clockwise, true);
+            ArcSegment arc = new ArcSegment(new Point(700, margin+22), new Size(20,80), 0, true, SweepDirection.Clockwise, true);
             PathFigure PF = new PathFigure();
             PF.StartPoint = new Point(700, margin2+22);
             PF.Segments.Add(arc);
@@ -524,6 +529,19 @@ namespace CUDA流程图提取工具
             path.Data = PG;
             path.Stroke = Brushes.Black;
             SP.Children.Add(path);
+            DrawStraight(margin2);
+        }
+
+        private void DrawStraight(int margin)
+        {
+            MyControl.Arrow A= new MyControl.Arrow();
+            Thickness T = new Thickness();
+            T.Top = margin+10;
+            T.Left = 690;
+            A.HorizontalAlignment = HorizontalAlignment.Center;
+            A.VerticalAlignment = VerticalAlignment.Center;
+            A.Margin = T;
+            SP.Children.Add(A);
         }
 
         /// <summary>
