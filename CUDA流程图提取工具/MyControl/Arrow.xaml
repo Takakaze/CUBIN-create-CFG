@@ -8,6 +8,15 @@
              d:DesignHeight="20" d:DesignWidth="20"
              Height="20" Width="20">
     <Grid>
-        <Image Source="C:\Users\10698\Desktop\noname.png"/>
+        <Image Source="C:\Users\10698\Desktop\noname.png" RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="180"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
     </Grid>
 </UserControl>

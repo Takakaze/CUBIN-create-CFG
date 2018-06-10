@@ -26,11 +26,11 @@ namespace CUDA流程图提取工具.MyControl
         public string Text
         { get
             {
-                return this.tb.Text;
+                return this.tb.Text;//从外部获取Block中所显示的内容
             }
             set
             {
-                this.tb.Text = value;
+                this.tb.Text = value;//将获取的内容显示在界面中
             }
         }
 

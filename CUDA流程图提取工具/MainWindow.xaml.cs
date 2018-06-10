@@ -18,6 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Security.Permissions;
+using System.Threading;
 
 namespace CUDA流程图提取工具
 {
@@ -211,12 +212,12 @@ namespace CUDA流程图提取工具
                 p.Start();//启动程序
                 p.StandardInput.WriteLine(commandstr + "&exit");
                 p.StandardInput.AutoFlush = true;
-                output = p.StandardOutput.ReadToEnd();
-                p.WaitForExit();
-                p.Close();
-                output = output.Replace("&exit", "^");
+                output = p.StandardOutput.ReadToEnd();//获取程序输出信息
+                p.WaitForExit();//等待系统退出
+                p.Close();//关闭程序并并返回资源
+                output = output.Replace("&exit", "^");//去除获得结果中与控制流程无关部分
                 output = output.Substring(output.IndexOf('^') + 1);
-                STRVision.Text = output;
+                STRVision.Text = output;//将反编译结果在界面中显示
             }
             catch (Exception ex)
             {
@@ -230,7 +231,7 @@ namespace CUDA流程图提取工具
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DRAW_CFG(object sender, RoutedEventArgs e)
+        private async void DRAW_CFG(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -418,13 +419,13 @@ namespace CUDA流程图提取工具
                 }
                 output = new string(OP);
                 STRVision.Text = output;
-                int margin = 0;
-                int margin2 = 0;
+                double margin = 0;
+                double margin2 = 0;
                 for (int i = 0; i < BlockId; i++)
                 {
                     if (i == 0)
                     {
-                        Drawblock(BlockDatas[i].Content, 0);
+                        await Drawblock(BlockDatas[i].Content, 0);
                     }
                     else
                     {
@@ -433,7 +434,7 @@ namespace CUDA流程图提取工具
                         {
                             margin += BlockDatas[j].height;
                         }
-                        Drawblock(BlockDatas[i].Content, margin);
+                        await Drawblock(BlockDatas[i].Content, margin);
                         SP.Height = margin + 200;
                     }
                 }
@@ -457,6 +458,31 @@ namespace CUDA流程图提取工具
                         }
                     }
                 }
+                for (int i = 0; i < BlockId; i++)
+                {
+                    margin = 0;
+                    margin2 = 0;
+                    if (BlockDatas[i].type == "entry")
+                    {
+                        if (i == 0)
+                        {
+                            margin = marginout[i];
+                        }
+                        else
+                        {
+                            for (int k = i-1; k >= 0; k--)
+                            {
+                                margin += BlockDatas[k].height;
+                            }
+                            margin += marginout[i];
+                        }
+                        for (int k = i; k >= 0; k--)
+                        {
+                            margin2 += BlockDatas[k].height;
+                        }
+                        DrawStraight(margin, margin2);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -472,24 +498,33 @@ namespace CUDA流程图提取工具
         /// <param name="type"></param>
         private void CreateBlock(string text,string type,string blockname)
         {
-            BlockDatas.Add(new BlockData { Content = text, height = MarginCal(text), type = type, name = blockname });
+            BlockDatas.Add(new BlockData { Content = text, height = MarginCal(text), type = type, name = blockname });//新建一个基本块部分并导入所需信息
         }
+
+
+        public List<Block> Blocks = new List<Block>();
+        double[] marginout = new double[10];
+        int MarginCount = 0;
 
         /// <summary>
         /// 绘制一个新的block，前提是要先创立该block
         /// </summary>
         /// <param name="text"></param>
         /// <param name="Margin_Top"></param>
-        private void Drawblock(string text, int Margin_Top)
+        private async Task Drawblock(string text, double Margin_Top)
         {
-            var block = new MyControl.Block { Text = text };
+            var block = new MyControl.Block { Text = text };//新建一个显示控件
             Thickness TN = new Thickness();
-            TN.Top = Margin_Top;
+            TN.Top = Margin_Top;//确定显示控件的显示位置
             block.HorizontalAlignment = HorizontalAlignment.Center;
             block.VerticalAlignment = VerticalAlignment.Top;
             block.Width = 700;
             block.Margin = TN;
-            this.SP.Children.Add(block);
+            this.SP.Children.Add(block);//在界面中显示基本块部分
+            await Task.Run(() => { Thread.Sleep(10); });//等待绘制结束
+            marginout[MarginCount] = block.ActualHeight;
+            MarginCount++;      
+            //计算并保存基本块部分占用面积
         }
 
         /// <summary>
@@ -500,7 +535,7 @@ namespace CUDA流程图提取工具
         private int MarginCal(string text)
         {
             int MarginReturn = 1;
-            foreach (char Enter in text)
+            foreach (char Enter in text)//根据待显示内容中的行数计算占用面积
             {
                 if (Enter == '\r') 
                 {
@@ -517,7 +552,7 @@ namespace CUDA流程图提取工具
         /// </summary>
         /// <param name="margin"></param>
         /// <param name="num"></param>
-        private void Drawline(int margin, int margin2)
+        private void Drawline(double margin, double margin2)
         {
             System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
             PathGeometry PG = new PathGeometry();
@@ -529,15 +564,32 @@ namespace CUDA流程图提取工具
             path.Data = PG;
             path.Stroke = Brushes.Black;
             SP.Children.Add(path);
-            DrawStraight(margin2);
+            DrawArrow(margin2,690);
         }
 
-        private void DrawStraight(int margin)
+
+        private void DrawStraight(double margin, double margin2)
+        {
+            System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
+            PathGeometry PG = new PathGeometry();
+            LineSegment line = new LineSegment(new Point(350, margin), true);
+            PathFigure PF = new PathFigure();
+            PF.StartPoint = new Point(350, margin2);
+            PF.Segments.Add(line);
+            PG.Figures.Add(PF);
+            path.Data = PG;
+            path.Stroke = Brushes.Black;
+            SP.Children.Add(path);
+            DrawArrow(margin2-22,340);
+        }
+        
+
+        private void DrawArrow(double margin,double margin2)
         {
             MyControl.Arrow A= new MyControl.Arrow();
             Thickness T = new Thickness();
             T.Top = margin+10;
-            T.Left = 690;
+            T.Left = margin2;
             A.HorizontalAlignment = HorizontalAlignment.Center;
             A.VerticalAlignment = VerticalAlignment.Center;
             A.Margin = T;

@@ -24,5 +24,10 @@ namespace CUDA流程图提取工具.MyControl
         {
             InitializeComponent();
         }
+
+        public static implicit operator RotateTransform(Arrow v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
